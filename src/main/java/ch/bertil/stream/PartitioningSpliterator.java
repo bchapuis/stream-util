@@ -1,12 +1,12 @@
 package ch.bertil.stream;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
-public class PartitioningSpliterator<T> extends BatchSpliterator<Stream<T>> {
+public class PartitioningSpliterator<T> extends BatchSpliterator<Collection<T>> {
 
     private final Spliterator<T> spliterator;
     private final int partitionSize;
@@ -19,7 +19,7 @@ public class PartitioningSpliterator<T> extends BatchSpliterator<Stream<T>> {
     }
 
     @Override
-    public boolean tryAdvance(Consumer<? super Stream<T>> consumer) {
+    public boolean tryAdvance(Consumer<? super Collection<T>> consumer) {
         final HoldingConsumer holder = new HoldingConsumer();
         if (!spliterator.tryAdvance(holder)) {
             return false;
@@ -29,7 +29,7 @@ public class PartitioningSpliterator<T> extends BatchSpliterator<Stream<T>> {
         do {
             partition.add((T) holder.getValue());
         } while (++j < partitionSize && spliterator.tryAdvance(holder));
-        consumer.accept(partition.stream());
+        consumer.accept(partition);
         return true;
     }
 
